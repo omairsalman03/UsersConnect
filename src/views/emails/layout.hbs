@@ -1,92 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { 
-      font-family: 'Segoe UI', Arial, sans-serif; 
-      line-height: 1.6; 
-      color: #333; 
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
-    .container { 
-      max-width: 600px; 
-      margin: 20px auto; 
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .header { 
-      background: linear-gradient(90deg, #007bff, #6610f2); 
-      padding: 30px; 
-      text-align: center;
-    }
-    .header img {
-      height: 50px;
-      width: auto;
-    }
-    .content { 
-      padding: 10px;
-    }
-    .code-box {
-      background: #f8f9fa;
-      border: 2px dashed #007bff;
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      margin: 25px 0;
-    }
-    .code {
-      font-size: 32px;
-      font-weight: bold;
-      letter-spacing: 8px;
-      color: #007bff;
-      font-family: 'Segoe UI', Roboto, sans-serif;
-    }
-    .warning { 
-      background: #fff3cd; 
-      border-left: 4px solid #ffc107; 
-      padding: 12px; 
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .info { 
-      background: #e7f3ff; 
-      border-left: 4px solid #007bff; 
-      padding: 12px; 
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .footer { 
-      text-align: center; 
-      padding: 20px; 
-      color: #666; 
-      font-size: 12px;
-      background: #f8f9fa;
-      border-top: 1px solid #e0e0e0;
-    }
-    ul {
-      margin: 5px 0;
-      padding-left: 20px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<meta name="supported-color-schemes" content="dark light">
+<title>Hearthen</title>
+<style>
+  /* Dark is the inline default (renders in Gmail/Outlook/etc). The block below
+     repaints to light for clients that honour prefers-color-scheme (Apple Mail,
+     iOS Mail), including swapping the mark to the light asset. */
+  body { margin:0; padding:0; width:100% !important; background:#14100D; }
+  table { border-collapse:collapse; }
+  img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+  a { color:#F4A340; }
+
+  /* Re-assert the dark palette for dark-mode-aware clients (Apple Mail / Outlook)
+     so they use these exact colours rather than auto-generating their own. */
+  @media (prefers-color-scheme: dark) {
+    .email-bg { background:#241C18 !important; }
+    .card     { background:#241C18 !important; border-color:#3A2E27 !important; }
+  }
+
+  @media (prefers-color-scheme: light) {
+    .email-bg     { background:#F1E7D5 !important; }
+    .card         { background:#FAF4EA !important; border-color:#E6D8C0 !important; }
+    .logo-dark    { display:none !important; max-height:0 !important; overflow:hidden !important; mso-hide:all; }
+    .logo-light   { display:block !important; max-height:none !important; }
+    .eyebrow      { color:#C0501F !important; }
+    .heading      { color:#241C18 !important; }
+    .greeting     { color:#241C18 !important; }
+    .lead         { color:#5C4D40 !important; }
+    .code-label   { color:#897868 !important; }
+    .code-chip    { background:#FBEADB !important; border-color:#C0501F !important; color:#8E3318 !important;
+                    box-shadow:0 10px 26px rgba(226,98,42,0.16) !important; }
+    .expiry       { color:#897868 !important; }
+    .safety       { background:#F6EEDF !important; border-color:#ECE0CB !important; color:#5C4D40 !important; }
+    .safety-accent{ color:#C0501F !important; }
+    .foot-divider { border-top-color:#ECE0CB !important; }
+    .foot-main    { color:#5C4D40 !important; }
+    .foot-sub     { color:#A8967F !important; }
+  }
+</style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <img src="https://usersconnect.cloudomair.org/images/logo.svg" alt="UsersConnect" />
-    </div>
-    <div class="content">
-      {{{body}}}
-    </div>
-    <div class="footer">
-      <p>&copy; 2026 UsersConnect. All rights reserved.</p>
-      <p>This is an automated email. Please do not reply.</p>
-    </div>
-  </div>
+<body class="email-bg" style="margin:0; padding:0; background:#241C18;">
+  <table role="presentation" class="email-bg" width="100%" cellpadding="0" cellspacing="0" bgcolor="#241C18" style="background:#241C18;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <table role="presentation" class="card" width="480" cellpadding="0" cellspacing="0" bgcolor="#241C18"
+               style="width:100%; max-width:480px; background:#241C18; border:1px solid #3A2E27; border-radius:24px; overflow:hidden;">
+
+          <!-- Header: transparent lockup centred on the body. The ember glow is
+               baked into the PNG (behind the flame), so it renders identically in
+               every client and the transparent edges never seam against the card. -->
+          <tr>
+            <td align="center" style="padding:28px 36px 6px; text-align:center;">
+              <img class="logo-dark" width="260" alt="Hearthen"
+                   src="https://s3.cloudomair.org/usersconnect-media/lockup-dark-email.png"
+                   style="display:block; margin:0 auto; width:260px; max-width:70%; height:auto;">
+              <img class="logo-light" width="260" alt="Hearthen"
+                   src="https://s3.cloudomair.org/usersconnect-media/lockup-light-email.png"
+                   style="display:none; margin:0 auto; max-height:0; overflow:hidden; width:260px; max-width:70%; height:auto;">
+            </td>
+          </tr>
+
+          <!-- Content (per-email) -->
+          <tr>
+            <td align="center"
+                style="padding:34px 36px 30px; text-align:center;
+                       font-family:'Hanken Grotesk','Segoe UI',Helvetica,Arial,sans-serif;">
+              {{> @partial-block }}
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="foot-divider" align="center"
+                style="padding:20px 32px 24px; border-top:1px solid #322823;
+                       font-family:'Hanken Grotesk','Segoe UI',Helvetica,Arial,sans-serif;">
+              <p class="foot-main" style="margin:0 0 4px; font-size:12.5px; line-height:1.5; color:#C9BBA8;"><strong style="font-weight:700;">Hearthen</strong> &middot; Your hearth, your people, your space.</p>
+              <p class="foot-sub" style="margin:0 0 8px; font-size:12px; line-height:1.5; color:#6E5F4F;">{{> footerReason }}</p>
+              <p class="foot-sub" style="margin:0; font-size:12px; line-height:1.5; color:#6E5F4F;">This is an automated message from a no-reply address. Please don&rsquo;t reply, as the mailbox isn&rsquo;t monitored.</p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

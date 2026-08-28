@@ -1,14 +1,11 @@
-<h2>Welcome to UsersConnect!</h2>
-<p>Hi {{name}},</p>
-<p>Thanks for signing up! Use the code below to verify your email address:</p>
-
-<div class="code-box">
-  <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Your Verification Code:</div>
-  <div class="code">{{verificationCode}}</div>
-</div>
-
-<div class="info">
-  <strong>ℹ️ Note:</strong> This verification code expires in <strong>10 minutes</strong>.
-</div>
-
-<p>Enter this code on the verification page to activate your account.</p>
+{{#> emailLayout}}
+<div class="eyebrow" style="font-size:11.5px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:#F07A3F; margin-bottom:14px;">Email verification</div>
+<h2 class="heading" style="margin:0 0 16px; font-size:25px; font-weight:800; letter-spacing:-0.015em; line-height:1.15; color:#FAF4EA;">Welcome to the hearth</h2>
+<p class="greeting" style="margin:0 0 10px; font-size:16px; line-height:1.65; color:#FAF4EA;">Hi <strong style="font-weight:700;">{{name}}</strong>,</p>
+<p class="lead" style="margin:0 auto 28px; max-width:380px; font-size:16px; line-height:1.65; color:#C9BBA8;">We&rsquo;re glad you&rsquo;re here. Enter this code to verify your email and finish lighting your account, your first moment by the fire.</p>
+<div class="code-label" style="font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9A8973; margin-bottom:14px;">Your verification code</div>
+<div style="margin-bottom:14px;"><span class="code-chip" style="display:inline-block; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:33px; font-weight:700; letter-spacing:0.34em; text-indent:0.34em; padding:16px 26px; border-radius:14px; background:#1E1611; border:2px solid #C24E22; color:#FAF4EA; box-shadow:0 8px 26px rgba(226,98,42,0.28);">{{verificationCode}}</span></div>
+<p class="expiry" style="margin:0 0 26px; font-size:13px; color:#9A8973;">This code expires in 10 minutes.</p>
+<div class="safety" style="padding:15px 18px; border-radius:12px; background:#20160F; border:1px solid #322823; font-size:13.5px; line-height:1.55; color:#C9BBA8;"><strong class="safety-accent" style="color:#F07A3F; font-weight:700;">A quick safety note:</strong> never share this code, not even with us. If this wasn&rsquo;t you, you can safely ignore this email and nothing will change.</div>
+{{#*inline "footerReason"}}You&rsquo;re getting this because someone is using this address to sign up for Hearthen.{{/inline}}
+{{/emailLayout}}

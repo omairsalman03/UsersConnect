@@ -8,7 +8,6 @@ import { config } from '../config';
 
 export class EmailService {
   private transporter: nodemailer.Transporter;
-  private layoutTemplate: HandlebarsTemplateDelegate;
 
   constructor() {
     // Create SMTP transporter with proper typing
@@ -24,10 +23,11 @@ export class EmailService {
 
     this.transporter = nodemailer.createTransport(transportOptions);
 
-    // Load layout template
+    // Register the shared email layout as a partial so each template can extend
+    // it via Handlebars partial-blocks ({{#> emailLayout}} … {{/emailLayout}}).
     const layoutPath = path.join(__dirname, '../views/emails/layout.hbs');
     const layoutSource = fs.readFileSync(layoutPath, 'utf-8');
-    this.layoutTemplate = handlebars.compile(layoutSource);
+    handlebars.registerPartial('emailLayout', layoutSource);
 
     // Verify connection on startup
     this.verifyConnection();
@@ -44,16 +44,12 @@ export class EmailService {
   }
 
   private renderTemplate(templateName: string, data: any): string {
-    // Load template file
+    // Each template extends the registered `emailLayout` partial, so rendering
+    // it produces the full document (layout chrome + the template's content).
     const templatePath = path.join(__dirname, `../views/emails/${templateName}.hbs`);
     const templateSource = fs.readFileSync(templatePath, 'utf-8');
     const template = handlebars.compile(templateSource);
-
-    // Render content
-    const content = template(data);
-
-    // Wrap in layout
-    return this.layoutTemplate({ body: content });
+    return template(data);
   }
 
   /**
@@ -73,7 +69,7 @@ export class EmailService {
       const mailOptions = {
         from: `"${config.smtp.from.name}" <${config.smtp.from.email ?? config.smtp.user}>`,
         to: to,
-        subject: `Password Reset Code: ${resetCode} - UsersConnect`,
+        subject: `Password Reset Code: ${resetCode} · Hearthen`,
         html: html,
       };
 
@@ -103,7 +99,7 @@ export class EmailService {
       const mailOptions = {
         from: `"${config.smtp.from.name}" <${config.smtp.from.email ?? config.smtp.user}>`,
         to: to,
-        subject: `Verification Code: ${verificationCode} - UsersConnect`,
+        subject: `Verification Code: ${verificationCode} · Hearthen`,
         html: html,
       };
 
@@ -130,7 +126,7 @@ export class EmailService {
       const mailOptions = {
         from: `"${config.smtp.from.name}" <${config.smtp.from.email ?? config.smtp.user}>`,
         to: to,
-        subject: `Email Change Request: ${verificationCode} - UsersConnect`,
+        subject: `Email Change Request: ${verificationCode} · Hearthen`,
         html: html,
       };
 
@@ -157,7 +153,7 @@ export class EmailService {
       const mailOptions = {
         from: `"${config.smtp.from.name}" <${config.smtp.from.email ?? config.smtp.user}>`,
         to: to,
-        subject: `Verify Your New Email: ${verificationCode} - UsersConnect`,
+        subject: `Verify Your New Email: ${verificationCode} · Hearthen`,
         html: html,
       };
 
