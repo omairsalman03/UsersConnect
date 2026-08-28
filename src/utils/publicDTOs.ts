@@ -11,7 +11,8 @@ export function userToPublic(user: User): PublicUser {
     isEmailPublic: user.isEmailPublic,
     isEmailVerified: user.isEmailVerified,
     avatarURL: user.avatarURL,
-    isAdmin: user.isAdmin
+    isAdmin: user.isAdmin,
+    joinedAt: user.createdAt
   };
 }
 

@@ -37,7 +37,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "mysql2": "^3.14.3",
-    "nodemailer": "^8.0.1",
+    "nodemailer": "^9.0.6",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.28",
     "winston": "^3.19.0"
@@ -64,5 +64,9 @@
   "overrides": {
     "uuid": "^14.0.0",
     "typeorm": "^0.3.28"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true,
+    "unrs-resolver@1.11.1": true
   }
 }

@@ -6,6 +6,7 @@ export type PublicUser = {
   isEmailVerified: boolean;
   avatarURL: string;
   isAdmin: boolean;
+  joinedAt: Date;
 };
 
 export type MinimalUser = {

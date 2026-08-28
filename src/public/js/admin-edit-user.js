@@ -72,10 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const res = await fetch(`/users/${userId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            email,
-            isEmailVerified: false  // Reset verification on admin email change
-          })
+          body: JSON.stringify({ email })
         });
         const result = await res.json();
 

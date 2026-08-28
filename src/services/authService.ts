@@ -87,7 +87,7 @@ export default class AuthService
 
         const match = await bcrypt.compare(password, user.password);
         if(match)
-            return user;
+            return userToPublic(user);
         return null;
     }
     

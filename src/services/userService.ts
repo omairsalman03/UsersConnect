@@ -80,10 +80,11 @@ export default class UserService
             }
             // If user has custom S3 avatar, keep it unchanged
 
-            // Reset email verification when admin changes email
-            if (updatedUser.isEmailVerified === false) {
-                updateData.isEmailVerified = false;
-            }
+            // A new email address is unverified by definition — force
+            // re-verification regardless of what the client sent. This is
+            // enforced server-side so every client (web, mobile, API) behaves
+            // identically when an admin changes a user's email.
+            updateData.isEmailVerified = false;
         }
 
         // ============================================
