@@ -24,6 +24,8 @@ import hbsHelpers from './views/helpers/hbsHelpers';
 import logger from './config/logger';
 import ConfigRouter from './routers/api/configRouter';
 
+import { APP_VERSION } from './config/version';
+
 const app = express();
 
 // ============================================
@@ -106,6 +108,8 @@ async function connectWithRetry(
 }
 
 async function startServer() {
+  logger.info(`UsersConnect ${APP_VERSION ?? '(unknown version)'} starting`);
+
   await connectWithRetry();
   
   // Register routes
