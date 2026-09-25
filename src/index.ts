@@ -114,8 +114,6 @@ async function connectWithRetry(
 async function startServer() {
   logger.info(`UsersConnect ${APP_VERSION ?? '(unknown version)'} starting`);
 
-  startUpdateCheck();
-
   await connectWithRetry();
 
   app.use((_req, res, next) => {
@@ -143,8 +141,15 @@ async function startServer() {
   // Internal port is fixed to match Dockerfile EXPOSE 3000.
   // Use Docker port mapping for external port changes: docker run -p 8080:3000
   const PORT = 3000;
-  app.listen(PORT, () => {
+  app.listen(PORT, (error) =>
+  {
+    if (error)
+    {
+      logger.error(`Failed to start server on port ${PORT}:`, error);
+      process.exit(1);
+    }
     logger.info(`🚀 Server running on port ${PORT}`);
+    startUpdateCheck();
   });
 }
 
