@@ -21,7 +21,7 @@
     "migration:show": "npm run typeorm -- migration:show -d src/config/dataSource.ts"
   },
   "author": "Omair Salman",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.985.0",
     "bcrypt": "^6.0.0",
