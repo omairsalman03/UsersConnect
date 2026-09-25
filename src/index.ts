@@ -26,6 +26,8 @@ import ConfigRouter from './routers/api/configRouter';
 
 import { APP_VERSION } from './config/version';
 
+import { startUpdateCheck } from './services/updateCheckService';
+
 const app = express();
 
 // ============================================
@@ -109,6 +111,8 @@ async function connectWithRetry(
 
 async function startServer() {
   logger.info(`UsersConnect ${APP_VERSION ?? '(unknown version)'} starting`);
+
+  startUpdateCheck();
 
   await connectWithRetry();
   
