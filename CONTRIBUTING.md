@@ -30,18 +30,20 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ### Pull Requests
 
-1. Fork the repo and create your branch from `main`
+Before your first pull request can be merged, you'll need to sign the [Contributor License Agreement](CLA.md). A bot comments on your pull request with a link; signing takes a minute and covers your future contributions too.
+
+1. Fork the repo and create your branch from the default branch
 2. If you've added code that should be tested, add tests
 3. If you've changed APIs, update the documentation
-4. Ensure the test suite passes
-5. Make sure your code follows the existing style
+4. Make sure `npm run build` succeeds and any tests pass
+5. Match the style of the file you're editing
 6. Issue that pull request!
 
 ## Development Setup
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22 or later (the Docker image uses 26)
 - MySQL 8.0+
 - Redis 6.0+
 - Git
@@ -79,23 +81,24 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ```
 src/
-├── config/           # Database, Redis, and type definitions
-├── controllers/      # Request handlers
+├── config/          # Configuration, database, Redis, logging
+├── controllers/     # Request handlers
 │   ├── api/         # REST API endpoints
 │   └── web/         # Page rendering controllers
 ├── middlewares/     # Express middlewares
-│   ├── auth/       # Authentication checks
-│   └── validation/ # Input validation
+│   ├── auth/        # Authentication checks
+│   └── validation/  # Input validation
 ├── entities/        # TypeORM entities
+├── migrations/      # Database migrations
 ├── services/        # Business logic
 ├── routers/         # Route definitions
 ├── utils/           # Helper functions
 ├── views/           # Handlebars templates
-│   ├── layouts/    # Page layouts
-│   ├── pages/      # Full pages
-│   └── partials/   # Reusable components
-├── public/          # Static files (CSS, JS, images)
-└── tests/           # Test files
+│   ├── emails/      # Email templates
+│   ├── layouts/     # Page layouts
+│   ├── pages/       # Full pages
+│   └── partials/    # Reusable components
+└── public/          # Static files (CSS, JS, images)
 ```
 
 ## Coding Standards
@@ -110,8 +113,9 @@ src/
 
 ### Code Style
 
-- Use 2 spaces for indentation
-- Use single quotes for strings (except for template literals)
+The codebase isn't fully consistent yet: some files use 2-space indentation and others 4, and brace placement and quote style vary. So:
+
+- **Match the style of the file you're editing.** A consistent file matters more than a consistent project
 - Use semicolons
 - Use meaningful variable and function names
 - Keep functions small and focused
@@ -188,6 +192,8 @@ Fixes #456
 
 ## Testing
 
+> There are currently no automated tests. Jest is configured, so tests for new and existing code are very welcome.
+
 ### Writing Tests
 
 - Write tests for all new features
@@ -261,8 +267,10 @@ npm run migration:create -- src/migrations/YourMigrationName
 
 ## Questions?
 
-Feel free to open an issue with your question, or reach out via email.
+Feel free to open an issue with your question, or email OmairSalman@outlook.com.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+UsersConnect is licensed under [AGPL-3.0-only](LICENSE); see [LICENSING.md](LICENSING.md) for which license applies to which version.
+
+Contributions are accepted under the [Contributor License Agreement](CLA.md), which you sign once, on your first pull request. You keep the copyright in your contributions; the agreement grants the project a license to use them, including the ability to offer the project under other license terms in the future.
