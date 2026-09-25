@@ -27,6 +27,7 @@ import ConfigRouter from './routers/api/configRouter';
 import { APP_VERSION } from './config/version';
 
 import { getVisibleUpdateInfo, startUpdateCheck } from './services/updateCheckService';
+import { originCheck } from './middlewares/originCheck';
 
 const app = express();
 
@@ -81,6 +82,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(originCheck);
 
 // Database connection with retry logic.
 // Retry count and delay are honored from the config system (connectionRetries / retryDelay).
