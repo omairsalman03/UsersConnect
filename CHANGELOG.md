@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 25-09-2026
+
+### Added
+- **Daily update check** - Once a day (first check 30 seconds after startup), the server asks the UsersConnect check-in service whether a newer version exists. Only the product name and running version are sent; the service counts distinct instances per day using salted hashes with a secret rotated and deleted daily, and never stores IP addresses. Disable with `updateCheck.enabled: false` or `UPDATE_CHECK_ENABLED=false`
+- **Update badge and admin notices** - Admins see a badge on the Admin Tools link and a panel on `/admin/users` when an update is available or the service publishes a notice. Notices are plain text with an optional `https` link, and can be dismissed (instance-wide, persisted in Redis)
+- **`GET /config/version`** (admin) - Running version and the latest update-check result, for separate frontends
+- **`PUT /config/notice/dismissed`** (admin) - Dismiss the current notice
+- **`joinedAt` on public user objects** - API responses now include when the account was created, mapped from `User.createdAt`
+- **Running version in the startup log**
+- **Running version in the footer** - Shown to logged-in users only, so it isn't exposed to automated scanners
+
+### Changed
+- **License: MIT → AGPL-3.0** - Applies from this release onward. Versions 1.1.0 and earlier, including their Docker image tags, remain available under MIT; see `LICENSING.md`
+- **Admin email changes always reset verification** - The server now resets `isEmailVerified` whenever an admin changes a user's email, regardless of what the client sends, so web, mobile and API clients behave identically. The `isEmailVerified` field is no longer part of the admin edit-user request body
+- **Install scripts allowed for `bcrypt` and `unrs-resolver`**
+- **Package description** - Now describes what the project is
+
+### Fixed
+- **`verifyPassword` returns a public user object** - It previously returned the raw database entity despite being declared to return a `PublicUser`; it now goes through `userToPublic`
+- **Documentation corrections** - Removed the claim of unit test coverage (the tests were removed in 1.1.0) and the stale `tests/` entry in the project structure; documented the `/config` endpoints; GitHub links now point to the current `omairsalman03` account
+- **Startup failure is no longer reported as success** - If the port is already in use, the server now logs the error and exits instead of logging "Server running"
+
+### Security
+- **Cross-site request forgery (CSRF) protection** - State-changing requests (`POST`, `PUT`, `PATCH`, `DELETE`) are now rejected when their `Origin` header is neither this site nor a configured CORS origin. Since 1.0.4 moved auth cookies to `SameSite=None` for mobile clients, a malicious website could make a logged-in user's browser create posts, comment, like or dislike, replace their profile picture, or trigger verification emails. Actions using `PUT` or `DELETE`, including editing or deleting users and changing admin status, were not affected
+- **nodemailer** 8.0.7 → 9.0.6: Fixed GHSA-p6gq-j5cr-w38f. The v9 breaking change only affects TLS validation when fetching remote content (attachment URLs, OAuth2 endpoints, proxy CONNECT), none of which UsersConnect uses, so SMTP behaviour is unchanged
+- Resolved **4 npm audit vulnerabilities** (2 high, 2 moderate) via non-breaking `npm audit fix` (no `--force` required)
+- **multer** 2.2.0 → 2.4.0 (high): Fixed DoS via crafted multipart field names, file descriptor leak on aborted uploads, file size limit bypass via an async fileFilter race condition, and DoS via oversized array indices in field names (GHSA-wc9g-mxfw-jrwm, GHSA-qfvm-cv95-jqjf, GHSA-qvfw-j98x-7q72, GHSA-535w-7cp7-47q4)
+- **nodemailer** 9.0.6 → 9.1.1 (high): Fixed resolveContent() bypassing disableFileAccess/disableUrlAccess with the legacy signature, recipient-domain validation bypasses via IDN/Punycode and RFC 5322 comment parsing, and quadratic-time addressparser DoS (GHSA-8m3c-c648-2xjj, GHSA-wmmp-3585-3rmp, GHSA-cc9r-2j5m-2m83, GHSA-2x7j-588g-ccc2)
+- **mysql2** 3.22.3 → 3.24.4 (moderate): Fixed decompression-bomb DoS via unbounded zlib inflate in the compressed protocol handler (GHSA-rgwj-5xj2-c3m3)
+- **qs** 6.15.2 → 6.16.0 (moderate): Fixed array-limit bypass via bracket-key comma parsing and DoS via an attacker-controlled isBuffer (GHSA-x5fp-wj9c-mxmx, GHSA-4mjr-xmp4-gh2g)
+
 ## [1.1.0] - 14-06-2026
 
 > Note: cross-site cookie support for mobile clients partially landed in 1.0.4; this release extends `sameSite:none` consistently across all authentication flows.
@@ -149,11 +180,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Navigation hyperlinks
 - Post/comment edit mode
 
-[1.1.0]: https://github.com/OmairSalman/UsersConnect/compare/v1.0.4...v1.1.0
-[1.0.4]: https://github.com/OmairSalman/UsersConnect/compare/v1.0.3...v1.0.4
-[1.0.3]: https://github.com/OmairSalman/UsersConnect/compare/v1.0.2...v1.0.3
-[1.0.2]: https://github.com/OmairSalman/UsersConnect/compare/v1.0.1...v1.0.2
-[1.0.1]: https://github.com/OmairSalman/UsersConnect/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/OmairSalman/UsersConnect/compare/v1.0.0-rc.2...v1.0.0
-[1.0.0-rc.2]: https://github.com/OmairSalman/UsersConnect/compare/v1.0.0-rc.1...v1.0.0-rc.2
-[1.0.0-rc.1]: https://github.com/OmairSalman/UsersConnect/releases/tag/v1.0.0-rc.1
+[1.2.0]: https://github.com/omairsalman03/UsersConnect/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/omairsalman03/UsersConnect/compare/v1.0.4...v1.1.0
+[1.0.4]: https://github.com/omairsalman03/UsersConnect/compare/v1.0.3...v1.0.4
+[1.0.3]: https://github.com/omairsalman03/UsersConnect/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/omairsalman03/UsersConnect/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/omairsalman03/UsersConnect/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/omairsalman03/UsersConnect/compare/v1.0.0-rc.2...v1.0.0
+[1.0.0-rc.2]: https://github.com/omairsalman03/UsersConnect/compare/v1.0.0-rc.1...v1.0.0-rc.2
+[1.0.0-rc.1]: https://github.com/omairsalman03/UsersConnect/releases/tag/v1.0.0-rc.1

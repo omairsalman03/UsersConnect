@@ -7,11 +7,11 @@ Initially built during summer field training at [AsalTech](https://asaltech.com/
 **Live Version:** [https://usersconnect.cloudomair.org/](https://usersconnect.cloudomair.org/)  
 **Docker Hub:** [omairsalman/usersconnect](https://hub.docker.com/r/omairsalman/usersconnect)
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/OmairSalman/UsersConnect/releases)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/omairsalman03/UsersConnect/releases)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/omairsalman/usersconnect)](https://hub.docker.com/r/omairsalman/usersconnect)
 [![Docker Image Size](https://img.shields.io/docker/image-size/omairsalman/usersconnect/latest?label=image%20size)](https://hub.docker.com/r/omairsalman/usersconnect)
-[![GitHub Stars](https://img.shields.io/github/stars/OmairSalman/UsersConnect?style=social)](https://github.com/OmairSalman/UsersConnect/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/omairsalman03/UsersConnect?style=social)](https://github.com/omairsalman03/UsersConnect/stargazers)
 [![Live Demo](https://img.shields.io/badge/demo-online-success?logo=google-chrome&logoColor=white)](https://usersconnect.cloudomair.org/)
 
 ---
@@ -24,6 +24,7 @@ Initially built during summer field training at [AsalTech](https://asaltech.com/
 - [Why HTTPS is Required](#why-https-is-required)
 - [Configuration](#️-configuration)
 - [S3 Image Uploads (Optional)](#️-s3-image-uploads-optional)
+- [Update Check](#-update-check)
 - [Docker Deployment](#-docker-deployment)
 - [First-Time Setup](#-first-time-setup)
 - [Project Structure](#-project-structure)
@@ -69,15 +70,15 @@ Initially built during summer field training at [AsalTech](https://asaltech.com/
 - 👥 **User Administration** - Edit names, emails, passwords independently
 - 🔧 **Role Management** - Grant/revoke admin privileges
 - 🎯 **First-Time Setup Wizard** - Guided setup for initial admin account and optional features
+- 🔔 **Update Notifications** - Admins are told when a new release is available ([details](#-update-check))
 
 ### Technical Features
 - ⚡ **Redis Caching** - Improved performance with intelligent cache invalidation
 - ⚙️ **YAML Configuration** - Centralized config with environment variable overrides
 - 🗄️ **Database Migrations** - Safe schema management with TypeORM migrations
 - 🎨 **Server-Side Rendering** - Fast initial page loads with Handlebars
-- 🔒 **Security Best Practices** - Password hashing, HTTP-only cookies, CSRF protection
+- 🔒 **Security Best Practices** - Password hashing, HTTP-only cookies, CSRF protection via Origin checking
 - 📱 **Responsive Design** - Mobile-first Bootstrap 5 interface
-- 🧪 **Unit Tested** - Jest test coverage for critical components
 - ☁️ **Optional Cloud Storage** - S3-compatible storage for images (AWS, MinIO, DigitalOcean, etc.)
 
 ---
@@ -85,7 +86,7 @@ Initially built during summer field training at [AsalTech](https://asaltech.com/
 ## 🛠 Tech Stack
 
 ### Backend
-- **Runtime:** Node.js 18+
+- **Runtime:** Node.js 22+ (Docker image: Node 26)
 - **Framework:** Express 5
 - **Language:** TypeScript
 - **ORM:** TypeORM (with migrations)
@@ -116,7 +117,7 @@ Initially built during summer field training at [AsalTech](https://asaltech.com/
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js 22 or later, and npm
 - MySQL 8.0+
 - Redis 6.0+
 - (Optional) Docker and Docker Compose
@@ -127,7 +128,7 @@ Initially built during summer field training at [AsalTech](https://asaltech.com/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/OmairSalman/UsersConnect.git
+   git clone https://github.com/omairsalman03/UsersConnect.git
    cd usersconnect
    ```
 
@@ -344,6 +345,47 @@ s3:
 ### Without S3
 
 The application works perfectly without S3 configuration - posts won't have image upload capability and profile pictures will use Gravatar. All other features remain fully functional.
+
+---
+
+## 🔔 Update Check
+
+Starting with v1.2.0, UsersConnect checks once a day whether a newer version is available. When one is, admins see a badge on the **Admin Tools** link and the details on the admin page.
+
+### What is sent
+
+Once a day, with the first check 30 seconds after startup, the server makes one request to `https://checkin.usersconnect.cloudomair.org/v1/check` containing two values:
+
+- `product`, which is always `api`
+- `version`, the running version, e.g. `1.2.0`
+
+Nothing else: no instance ID, no domain name, no user data, no configuration.
+
+### What the service does with it
+
+The check-in service replies with the latest release and, occasionally, a short notice (for example, announcing a major new release). It also counts how many distinct instances check in each day, which is the only way to know how many deployments are actually running:
+
+- **Your IP address is never stored.** It's combined with a random secret that changes every day, and only the resulting hash is kept.
+- **Each day's secret is deleted** once the day is over. After that, that day's hashes can't be linked to any address, not even by the service's operator.
+- IPv6 addresses are reduced to their `/64` network before hashing.
+
+The service is open source, so you can check exactly what it does: [omairsalman03/usersconnect-checkin](https://github.com/omairsalman03/usersconnect-checkin).
+
+If the service is unreachable, the check logs a single warning and the app carries on unaffected.
+
+### Notices
+
+A notice is plain text: a title of up to 100 characters, a body of up to 500, and an optional `https` link. Notices appear only to admins, on the admin page, and can be dismissed.
+
+### Turning it off
+
+```yaml
+# config.yaml
+updateCheck:
+  enabled: false
+```
+
+or set `UPDATE_CHECK_ENABLED=false`. When disabled, the app makes no requests to the service at all. The startup log always states whether the check is enabled, and where it sends.
 
 ---
 
@@ -569,7 +611,8 @@ usersconnect/
 │   │   ├── express.d.ts             # Express type extensions
 │   │   ├── index.ts                 # Config singleton
 │   │   ├── logger.ts                # Winston logger setup
-│   │   └── redis.ts                 # Redis client
+│   │   ├── redis.ts                 # Redis client
+│   │   └── version.ts               # Running version from package.json
 │   ├── controllers/                 # Request handlers
 │   │   ├── api/
 │   │   │   ├── authController.ts
@@ -596,9 +639,9 @@ usersconnect/
 │   │   │   ├── commentValidation.ts
 │   │   │   ├── postValidation.ts
 │   │   │   └── userValidation.ts
+│   │   ├── originCheck.ts           # CSRF Origin check
 │   │   └── setupCheck.ts            # Setup wizard redirect
 │   ├── migrations/                  # Database migrations
-│   │   ├── .gitkeep
 │   │   └── [timestamp]-InitialSchema.ts
 │   ├── routers/
 │   │   ├── api/
@@ -617,6 +660,7 @@ usersconnect/
 │   │   ├── emailService.ts          # SMTP email (optional)
 │   │   ├── postService.ts
 │   │   ├── s3Service.ts             # S3 uploads (optional)
+│   │   ├── updateCheckService.ts    # Daily update check (optional)
 │   │   └── userService.ts
 │   ├── utils/                       # Helper utilities
 │   │   ├── asString.ts              # Type conversion helpers
@@ -642,7 +686,9 @@ usersconnect/
 │   │       ├── login.js
 │   │       ├── register.js
 │   │       ├── reset-password-confirm.js
+│   │       ├── secure-context-guard.js # HTTPS check on auth pages
 │   │       ├── setup.js
+│   │       ├── update-notice.js     # Dismiss update notices
 │   │       ├── verify-email.js
 │   │       └── verify-reset-code.js
 │   ├── views/                       # Handlebars templates
@@ -673,27 +719,21 @@ usersconnect/
 │   │   │   ├── setup.hbs
 │   │   │   ├── terms.hbs
 │   │   │   └── users.hbs
-│   │   ├── partials/
-│   │   │   ├── commentCard.hbs
-│   │   │   ├── dislikePopup.hbs
-│   │   │   ├── footer.hbs
-│   │   │   ├── likePopup.hbs
-│   │   │   ├── navbar.hbs
-│   │   │   └── postCard.hbs
-│   │   └── index.ts                 # View engine setup
-│   └── tests/                       # Jest unit tests
-│       ├── controllers/
-│       │   └── authController.test.ts
-│       ├── middlewares/
-│       │   └── auth.test.ts
-│       └── services/
-│           ├── authService.test.ts
-│           └── userToPublic.test.ts
+│   │   └── partials/
+│   │       ├── commentCard.hbs
+│   │       ├── dislikePopup.hbs
+│   │       ├── footer.hbs
+│   │       ├── likePopup.hbs
+│   │       ├── navbar.hbs
+│   │       └── postCard.hbs
+│   └── index.ts                     # App entry point: middleware, routers, startup
 ├── dist/                            # Compiled JavaScript
 ├── logs/                            # Application logs
 ├── .dockerignore
 ├── .env.example                     # Environment template
 ├── .gitignore
+├── CHANGELOG.md                     # Release history
+├── CLA.md                           # Contributor License Agreement
 ├── CLAUDE.md                        # Architecture documentation
 ├── CONTRIBUTING.md                  # Contributing guidelines
 ├── config.example.yaml              # Configuration template
@@ -701,9 +741,12 @@ usersconnect/
 ├── docker-compose.yml               # Docker Compose setup
 ├── Dockerfile
 ├── jest.config.ts                   # Jest configuration
-├── LICENSE                          # MIT License
+├── LICENSE                          # AGPL-3.0 license
+├── LICENSE-MIT-HISTORICAL           # MIT license (1.1.0 and earlier)
+├── LICENSING.md                     # Which license applies to which version
 ├── nodemon.json                     # Nodemon config
 ├── package.json
+├── PROVENANCE.md                    # Project history
 ├── README.md                        # This file
 └── tsconfig.json                    # TypeScript config
 ```
@@ -747,6 +790,12 @@ usersconnect/
 - `POST /comments/:commentId/dislike` - Dislike comment
 - `DELETE /comments/:commentId/dislike` - Undislike comment
 
+### Config
+- `GET /config/s3` - Whether S3 uploads are enabled
+- `GET /config/smtp` - Whether SMTP email is enabled
+- `GET /config/version` - Running version and latest update-check result (admin)
+- `PUT /config/notice/dismissed` - Dismiss the current notice; body `{ "id": "..." }` (admin)
+
 ### Email Verification (requires SMTP)
 - `GET /verify-email` - Show verification page
 - `POST /verify-email` - Submit verification code
@@ -765,6 +814,8 @@ usersconnect/
 ---
 
 ## 🧪 Testing
+
+> There are currently no automated tests. Jest is configured, so these commands run and new tests can be added under `src/`.
 
 ```bash
 # Run all tests
@@ -934,7 +985,8 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gu
 2. Create feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit changes (`git commit -m 'feat: add amazing feature'`)
 4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+5. Sign the [Contributor License Agreement](CLA.md) when the bot asks
+6. Open Pull Request
 
 ### Commit Convention
 
@@ -950,7 +1002,7 @@ Use conventional commits:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+UsersConnect is licensed under the [GNU Affero General Public License v3.0](LICENSE), starting with version 1.2.0. Versions 1.1.0 and earlier remain available under the MIT License. See [LICENSING.md](LICENSING.md) for which license applies to which version, and [PROVENANCE.md](PROVENANCE.md) for the project's history.
 
 ---
 
@@ -968,15 +1020,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Omair Salman**
 
-- GitHub: [@OmairSalman](https://github.com/OmairSalman)
+- GitHub: [@omairsalman03](https://github.com/omairsalman03)
 - Email: OmairSalman@outlook.com
 
 ---
 
 ## 📞 Support
 
-- **Issues:** [GitHub Issues](https://github.com/OmairSalman/UsersConnect/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/OmairSalman/UsersConnect/discussions)
+- **Issues:** [GitHub Issues](https://github.com/omairsalman03/UsersConnect/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/omairsalman03/UsersConnect/discussions)
 - **Email:** OmairSalman@outlook.com
 
 ---
