@@ -1,4 +1,26 @@
 <div class="container py-4">
+  {{#if updateInfo}}
+    {{#if updateInfo.updateAvailable}}
+      <div class="alert alert-info d-flex justify-content-between align-items-center" role="status">
+        <div>
+          <strong>Update available:</strong>
+          UsersConnect {{updateInfo.latest}} is out. You're running {{appVersion}}.
+        </div>
+        <a href="{{updateInfo.url}}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer">Release notes</a>
+      </div>
+    {{/if}}
+
+    {{#with updateInfo.notice}}
+      <div class="alert alert-warning" role="status">
+        <strong>{{title}}</strong>
+        <p class="mb-0">{{body}}</p>
+        {{#if url}}
+          <a href="{{url}}" target="_blank" rel="noopener noreferrer">Learn more</a>
+        {{/if}}
+      </div>
+    {{/with}}
+  {{/if}}
+  
   <h1 class="mb-4 fw-bold">All Users</h1>
   <ul class="list-group user-list">
     {{#each users}}

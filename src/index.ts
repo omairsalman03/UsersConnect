@@ -26,7 +26,7 @@ import ConfigRouter from './routers/api/configRouter';
 
 import { APP_VERSION } from './config/version';
 
-import { startUpdateCheck } from './services/updateCheckService';
+import { getUpdateInfo, startUpdateCheck } from './services/updateCheckService';
 
 const app = express();
 
@@ -115,6 +115,14 @@ async function startServer() {
   startUpdateCheck();
 
   await connectWithRetry();
+
+  app.use((_req, res, next) => {
+    const info = getUpdateInfo();
+    res.locals.updateInfo = info;
+    res.locals.appVersion = APP_VERSION;
+    res.locals.adminAlert = info !== null && (info.updateAvailable || info.notice !== null);
+    next();
+  });
   
   // Register routes
   // Setup route must be registered BEFORE setupCheck so the wizard itself is always accessible
