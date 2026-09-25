@@ -11,16 +11,19 @@
     {{/if}}
 
     {{#with updateInfo.notice}}
-      <div class="alert alert-warning" role="status">
-        <strong>{{title}}</strong>
-        <p class="mb-0">{{body}}</p>
-        {{#if url}}
-          <a href="{{url}}" target="_blank" rel="noopener noreferrer">Learn more</a>
-        {{/if}}
+      <div class="alert alert-warning d-flex justify-content-between align-items-start gap-3" role="status">
+        <div>
+          <strong>{{title}}</strong>
+          <p class="mb-0">{{body}}</p>
+          {{#if url}}
+            <a href="{{url}}" target="_blank" rel="noopener noreferrer">Learn more</a>
+          {{/if}}
+        </div>
+        <button type="button" class="btn-close" aria-label="Dismiss notice" data-dismiss-notice="{{id}}"></button>
       </div>
     {{/with}}
   {{/if}}
-  
+
   <h1 class="mb-4 fw-bold">All Users</h1>
   <ul class="list-group user-list">
     {{#each users}}
@@ -63,3 +66,4 @@
 </div>
 
 <script src="/js/admin-users.js"></script>
+<script src="/js/update-notice.js"></script>

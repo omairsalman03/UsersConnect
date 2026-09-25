@@ -1,6 +1,7 @@
 import { config } from '../config';
 import logger from '../config/logger';
 import { APP_VERSION } from '../config/version';
+import redisClient from '../config/redis';
 
 export interface UpdateNotice {
   id: string;
@@ -23,7 +24,28 @@ const FIRST_CHECK_DELAY_MS = 30 * 1000;
 // The latest successful answer, or null if we haven't got one yet.
 let current: UpdateInfo | null = null;
 
-export function getUpdateInfo(): UpdateInfo | null {
+const DISMISSED_KEY = 'update-check:dismissed-notice';
+let dismissedNoticeId: string | null = null;
+
+async function loadDismissedNotice(): Promise<void> {
+  try {
+    dismissedNoticeId = await redisClient.get(DISMISSED_KEY);
+  } catch (err) {
+    logger.warn('Could not load dismissed notice from Redis:', err);
+  }
+}
+
+export async function setDismissedNotice(id: string): Promise<void> {
+  await redisClient.set(DISMISSED_KEY, id);
+  dismissedNoticeId = id;
+}
+
+// The latest result, with the notice hidden if an admin dismissed it.
+export function getVisibleUpdateInfo(): UpdateInfo | null {
+  if (!current) return null;
+  if (current.notice && current.notice.id === dismissedNoticeId) {
+    return { ...current, notice: null };
+  }
   return current;
 }
 
@@ -36,8 +58,8 @@ function parseNotice(value: unknown): UpdateNotice | null {
 
   const { id, title, body, url } = value as Record<string, unknown>;
 
-  if (typeof id !== 'string' || typeof title !== 'string' || typeof body !== 'string') return null;
-  if (title.length > 100 || body.length > 500) return null;
+  if (typeof id !== 'string' || !/^[a-z0-9-]{1,100}$/.test(id)) return null;
+  if (typeof title !== 'string' || typeof body !== 'string') return null;
 
   let noticeUrl: string | null = null;
   if (url !== undefined && url !== null) {
@@ -89,6 +111,8 @@ async function checkForUpdates(): Promise<void> {
 
 export function startUpdateCheck(): void {
   if (!config.updateCheck.enabled || !APP_VERSION) return;
+
+  void loadDismissedNotice();
 
   setTimeout(() => {
     void checkForUpdates();

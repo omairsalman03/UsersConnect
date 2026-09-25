@@ -26,7 +26,7 @@ import ConfigRouter from './routers/api/configRouter';
 
 import { APP_VERSION } from './config/version';
 
-import { getUpdateInfo, startUpdateCheck } from './services/updateCheckService';
+import { getVisibleUpdateInfo, startUpdateCheck } from './services/updateCheckService';
 
 const app = express();
 
@@ -117,7 +117,7 @@ async function startServer() {
   await connectWithRetry();
 
   app.use((_req, res, next) => {
-    const info = getUpdateInfo();
+    const info = getVisibleUpdateInfo();
     res.locals.updateInfo = info;
     res.locals.appVersion = APP_VERSION;
     res.locals.adminAlert = info !== null && (info.updateAvailable || info.notice !== null);
