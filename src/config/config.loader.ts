@@ -139,6 +139,11 @@ export function loadConfig(): AppConfig {
   if (!merged.logging) merged.logging = { level: 'info', directory: '/logs', maxFileSize: 10485760, maxFiles: 5 };
   if (process.env.LOG_LEVEL) merged.logging.level = process.env.LOG_LEVEL as AppConfig['logging']['level'];
 
+  // update check
+  if (!merged.updateCheck) merged.updateCheck = { ...(defaultConfig.updateCheck as AppConfig['updateCheck']) };
+  if (process.env.UPDATE_CHECK_ENABLED !== undefined) merged.updateCheck.enabled = process.env.UPDATE_CHECK_ENABLED === 'true';
+  if (process.env.UPDATE_CHECK_ENDPOINT) merged.updateCheck.endpoint = process.env.UPDATE_CHECK_ENDPOINT;
+
   // ── Step 4: Validate required fields ─────────────────────────────────────
   const missing: string[] = [];
 
@@ -175,6 +180,12 @@ export function loadConfig(): AppConfig {
   }
 
   console.log('[config] Configuration loaded successfully');
+
+  if (merged.updateCheck.enabled) {
+    console.log(`[config] Update check enabled — once a day, sends product and version to ${merged.updateCheck.endpoint} (disable with UPDATE_CHECK_ENABLED=false)`);
+  } else {
+    console.log('[config] Update check disabled');
+  }
 
   return merged as AppConfig;
 }

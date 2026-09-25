@@ -66,6 +66,11 @@ const defaultConfig: Partial<AppConfig> = {
     maxFileSize: 10 * 1024 * 1024, // 10 MB
     maxFiles: 5,
   },
+  
+  updateCheck: {
+    enabled: true,
+    endpoint: 'https://checkin.usersconnect.cloudomair.org',
+  },
 };
 
 export default defaultConfig;

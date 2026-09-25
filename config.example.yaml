@@ -124,3 +124,13 @@ logging:
   directory: logs       # default: logs (→ /app/logs in Docker)
   maxFileSize: 10485760 # 10 MB per log file before rotation
   maxFiles: 5           # Number of rotated files to retain
+
+# Update check — once a day, asks the UsersConnect check-in service whether a
+# newer version is available, and shows admins an "update available" notice.
+# Sends only the product name and this instance's version number: no
+# identifiers, no user data. The service counts how many distinct instances
+# check in each day, without storing IP addresses.
+# Set enabled: false to turn it off.
+updateCheck:
+  enabled: true
+  endpoint: https://checkin.usersconnect.cloudomair.org

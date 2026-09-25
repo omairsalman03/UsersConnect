@@ -134,4 +134,17 @@ export interface AppConfig {
     /** Maximum number of rotated log files to keep */
     maxFiles: number;
   };
+
+    /**
+   * Update check: once a day, asks the UsersConnect check-in service whether a
+   * newer version exists, so admins see an "update available" notice.
+   * Sends only the product name and this instance's version number.
+   * The service counts distinct instances per day without storing IP addresses.
+   */
+  updateCheck: {
+    /** Set to false to disable the check entirely */
+    enabled: boolean;
+    /** Base URL of the check-in service */
+    endpoint: string;
+  };
 }
