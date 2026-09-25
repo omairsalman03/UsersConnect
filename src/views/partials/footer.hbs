@@ -6,6 +6,9 @@
         <span class="fw-bold" style="background: linear-gradient(90deg, #007bff, #6610f2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
           UsersConnect
         </span>
+        {{#if currentUser}}{{#if appVersion}}
+          <span class="small opacity-75 ms-1">v{{appVersion}}</span>
+        {{/if}}{{/if}}
         &nbsp; © 2026. All rights reserved.
       </div>
 
