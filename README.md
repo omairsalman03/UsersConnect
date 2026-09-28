@@ -60,7 +60,7 @@ Initially built during summer field training at [AsalTech](https://asaltech.com/
   - Users can use the platform immediately without verification
 - 🖼️ **S3 Image Uploads** - Attach images to posts and custom profile pictures
   - Enabled automatically when S3 environment variables are set
-  - Supports AWS S3, MinIO, DigitalOcean Spaces, Cloudflare R2, and any S3-compatible storage
+  - Supports AWS S3, DigitalOcean Spaces, Cloudflare R2, and any S3-compatible storage
   - 5MB file size limit for profile pictures, 10MB for post images
   - Gracefully disabled when S3 is not configured
 - 🌐 **CORS Support** - Enable API access for separate frontend applications (Angular, React, Vue)
@@ -79,7 +79,7 @@ Initially built during summer field training at [AsalTech](https://asaltech.com/
 - 🎨 **Server-Side Rendering** - Fast initial page loads with Handlebars
 - 🔒 **Security Best Practices** - Password hashing, HTTP-only cookies, CSRF protection via Origin checking
 - 📱 **Responsive Design** - Mobile-first Bootstrap 5 interface
-- ☁️ **Optional Cloud Storage** - S3-compatible storage for images (AWS, MinIO, DigitalOcean, etc.)
+- ☁️ **Optional Cloud Storage** - S3-compatible storage for images (AWS, DigitalOcean, Cloudflare R2, etc.)
 
 ---
 
@@ -307,7 +307,6 @@ UsersConnect supports **optional** image uploads in posts and custom profile pic
 ### Supported Providers
 
 - ✅ **AWS S3** - Industry standard
-- ✅ **MinIO** - Self-hosted, free and open source
 - ✅ **DigitalOcean Spaces** - Simple pricing
 - ✅ **Cloudflare R2** - No egress fees
 - ✅ **Backblaze B2** - Cost-effective
@@ -323,7 +322,7 @@ S3_BUCKET_NAME=usersconnect-media
 S3_REGION=us-east-1
 
 # For non-AWS providers:
-S3_ENDPOINT=http://localhost:9000  # MinIO example
+S3_ENDPOINT=https://s3.example.com
 ```
 
 **Method 2: config.yaml**
@@ -458,90 +457,9 @@ Add to app environment:
       - SMTP_PASSWORD=your_smtp_password
 ```
 
-**Option 3: Self-hosted MinIO (Complete Stack)**
+**Self-hosted S3 storage**
 
-```yaml
-version: '3.8'
-
-services:
-  app:
-    image: omairsalman/usersconnect:latest
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./config.yaml:/app/config.yaml
-      - ./logs:/app/logs
-    environment:
-      - NODE_ENV=production
-      - DATABASE_HOST=mysql
-      - DATABASE_USERNAME=root
-      - DATABASE_PASSWORD=yourpassword
-      - DATABASE_NAME=usersconnect
-      - REDIS_HOST=redis
-      - REDIS_PASSWORD=yourredispassword
-      - ACCESS_TOKEN_SECRET=your-access-secret-here
-      - REFRESH_TOKEN_SECRET=your-refresh-secret-here
-      # MinIO Configuration
-      - S3_ACCESS_KEY=minioadmin
-      - S3_SECRET_KEY=minioadmin
-      - S3_BUCKET_NAME=usersconnect-media
-      - S3_REGION=us-east-1
-      - S3_ENDPOINT=http://minio:9000
-      # SMTP Configuration
-      - SMTP_HOST=smtp.zoho.com
-      - SMTP_PORT=465
-      - SMTP_SECURE=true
-      - SMTP_USER=noreply@example.com
-      - SMTP_PASSWORD=your_smtp_password
-    depends_on:
-      - mysql
-      - redis
-      - minio
-
-  mysql:
-    image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: yourpassword
-      MYSQL_DATABASE: usersconnect
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-  redis:
-    image: redis:alpine
-    command: redis-server --requirepass yourredispassword
-    volumes:
-      - redis_data:/data
-
-  minio:
-    image: minio/minio:latest
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    volumes:
-      - minio_data:/data
-    command: server /data --console-address ":9001"
-
-  minio-setup:
-    image: minio/mc:latest
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      sleep 5;
-      mc alias set myminio http://minio:9000 minioadmin minioadmin;
-      mc mb myminio/usersconnect-media --ignore-existing;
-      mc anonymous set download myminio/usersconnect-media;
-      exit 0;
-      "
-
-volumes:
-  mysql_data:
-  redis_data:
-  minio_data:
-```
+> ⚠️ **The MinIO example has been removed.** MinIO withdrew its community edition images from both Docker Hub and quay.io in September 2026, so they can no longer be pulled. A tested, maintained self-hosted alternative will be documented in an upcoming release. Until then, use any provider from [Supported Providers](#supported-providers). Existing MinIO setups keep running from Docker's local cache, so avoid re-pulling the MinIO image.
 
 ### Port Mapping
 
@@ -737,7 +655,7 @@ usersconnect/
 ├── CLAUDE.md                        # Architecture documentation
 ├── CONTRIBUTING.md                  # Contributing guidelines
 ├── config.example.yaml              # Configuration template
-├── docker-compose-s3.yml            # Docker with MinIO
+├── docker-compose-s3.yml            # Docker with S3 storage
 ├── docker-compose.yml               # Docker Compose setup
 ├── Dockerfile
 ├── jest.config.ts                   # Jest configuration
@@ -968,10 +886,6 @@ s3:
 - ~5 GB = **$0.12/month**
 - ~10k PUT + 100k GET = **$0.09/month**
 - **Total: ~$0.21/month**
-
-### Alternative: MinIO (Free, Self-Hosted)
-
-For development or self-hosting, see the Docker Compose MinIO example above. MinIO is 100% free and S3-compatible.
 
 ---
 

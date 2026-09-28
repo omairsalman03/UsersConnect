@@ -2,8 +2,6 @@
 # This file contains examples for different S3 providers
 # Uncomment the provider you want to use
 
-version: '3.8'
-
 services:
   app:
     image: omairsalman/usersconnect:latest
@@ -36,6 +34,8 @@ services:
 
       # ===========================================
       # S3 CONFIGURATION - Choose One Provider
+      # (The MinIO option was removed: MinIO's images can
+      #  no longer be pulled from Docker Hub or quay.io.)
       # ===========================================
 
       # OPTION 1: AWS S3 (Cloud)
@@ -45,15 +45,7 @@ services:
       # - S3_BUCKET_NAME=usersconnect-media
       # - S3_REGION=us-east-1
       
-      # OPTION 2: MinIO (Self-Hosted)
-      # Uncomment these 5 lines for MinIO:
-      # - S3_ACCESS_KEY=minioadmin
-      # - S3_SECRET_KEY=minioadmin
-      # - S3_BUCKET_NAME=usersconnect-media
-      # - S3_REGION=us-east-1
-      # - S3_ENDPOINT=http://minio:9000
-
-      # OPTION 3: DigitalOcean Spaces
+      # OPTION 2: DigitalOcean Spaces
       # Uncomment these 5 lines for DigitalOcean Spaces:
       # - S3_ACCESS_KEY=your-do-spaces-key
       # - S3_SECRET_KEY=your-do-spaces-secret
@@ -61,7 +53,7 @@ services:
       # - S3_REGION=nyc3
       # - S3_ENDPOINT=https://nyc3.digitaloceanspaces.com
 
-      # OPTION 4: Cloudflare R2
+      # OPTION 3: Cloudflare R2
       # Uncomment these 5 lines for Cloudflare R2:
       # - S3_ACCESS_KEY=your-r2-access-key
       # - S3_SECRET_KEY=your-r2-secret-key
@@ -72,8 +64,6 @@ services:
     depends_on:
       - mysql
       - redis
-      # Uncomment this if using MinIO:
-      # - minio
     restart: unless-stopped
 
   mysql:
@@ -92,43 +82,10 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
-  # ===========================================
-  # MINIO SETUP (OPTION 2 ONLY)
-  # Uncomment these services if using MinIO
-  # ===========================================
-
-  # minio:
-  #   image: minio/minio:latest
-  #   ports:
-  #     - "9000:9000"
-  #     - "9001:9001"
-  #   environment:
-  #     MINIO_ROOT_USER: minioadmin
-  #     MINIO_ROOT_PASSWORD: minioadmin
-  #   volumes:
-  #     - minio_data:/data
-  #   command: server /data --console-address ":9001"
-  #   restart: unless-stopped
-
-  # minio-setup:
-  #   image: minio/mc:latest
-  #   depends_on:
-  #     - minio
-  #   entrypoint: >
-  #     /bin/sh -c "
-  #     sleep 5;
-  #     mc alias set myminio http://minio:9000 minioadmin minioadmin;
-  #     mc mb myminio/usersconnect-media --ignore-existing;
-  #     mc anonymous set download myminio/usersconnect-media;
-  #     exit 0;
-  #     "
-
 volumes:
   mysql_data:
   redis_data:
   logs:
-  # Uncomment this if using MinIO:
-  # minio_data:
 
 # ===========================================
 # USAGE INSTRUCTIONS
@@ -136,10 +93,9 @@ volumes:
 #
 # 1. Choose ONE S3 provider from the options above
 # 2. Uncomment the corresponding environment variables
-# 3. If using MinIO, also uncomment the minio services and volume
-# 4. Replace placeholder values with your actual credentials
-# 5. Generate JWT secrets: openssl rand -hex 32
-# 6. Run: docker-compose -f docker-compose-s3.yml up -d
+# 3. Replace placeholder values with your actual credentials
+# 4. Generate JWT secrets: openssl rand -hex 32
+# 5. Run: docker-compose -f docker-compose-s3.yml up -d
 #
 # ===========================================
 # PROVIDER COMPARISON
@@ -150,13 +106,6 @@ volumes:
 #   - Free tier: 5GB storage, 20k GET, 2k PUT
 #   - After free tier: ~$0.023/GB/month
 #   - Setup: Create bucket + IAM user (see GitHub README)
-#
-# MinIO:
-#   - 100% free, open source
-#   - Self-hosted (uses your server resources)
-#   - S3-compatible API
-#   - Best for: Development, self-hosting
-#   - Console: http://localhost:9001
 #
 # DigitalOcean Spaces:
 #   - $5/month for 250GB
